@@ -9,11 +9,34 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [confirmpassword, setConfirmpassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Временно само логваме данните
-    console.log("Sign Up data:", { firstname, lastname, email, username, password, confirmpassword });
+    // Prepare user data
+    const userData = { firstname, lastname, email, username, password };
+
+    try {
+      // Send POST request to signup backend
+      const res = await fetch("http://localhost:8080/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Show error message from backend
+        alert(data.message);
+      } else {
+        // Successful signup
+        alert(data.message);
+        window.location.href = "/login"; // Redirect to login page
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("Something went wrong. Try again.");
+    }
   };
 
   return (
@@ -79,7 +102,10 @@ const Signup = () => {
         </button>
       </form>
       <p className="mt-4 text-white">
-        Already have an account? <Link to="/login" className="text-blue-800 hover:underline">Login</Link>
+        Already have an account?{" "}
+        <Link to="/login" className="text-blue-800 hover:underline">
+          Login
+        </Link>
       </p>
     </div>
   );

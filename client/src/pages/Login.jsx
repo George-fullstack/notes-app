@@ -5,11 +5,35 @@ const Login = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Тук ще добавим backend логика
-    console.log("Login data:", { usernameOrEmail, password });
+    // Prepare login data
+    const loginData = { identifier: usernameOrEmail, password };
+
+    try {
+      // Send POST request to login backend
+      const res = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Show error message from backend
+        alert(data.message);
+      } else {
+        // Successful login
+        localStorage.setItem("user", JSON.stringify(data.user)); // Store user info for frontend session
+        alert(data.message);
+        window.location.href = "/notes"; // Redirect to Notes page
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Something went wrong. Try again.");
+    }
   };
 
   return (
@@ -43,7 +67,10 @@ const Login = () => {
         </button>
       </form>
       <p className="mt-4 text-white">
-        Don't have an account? <Link to="/signup" className="text-blue-800 hover:underline">Sign Up</Link>
+        Don't have an account?{" "}
+        <Link to="/signup" className="text-blue-800 hover:underline">
+          Sign Up
+        </Link>
       </p>
     </div>
   );
