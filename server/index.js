@@ -8,12 +8,16 @@ const PORT = 8080;
 
 connectDb();
 
-app.use(cors());
-
 const corsOptions = {
   origin: 'http://localhost:5173/',
   optionsSuccessStatus: 200 
 }
+
+app.use(cors(corsOptions));
+app.use(express.json());
+
+const userRoutes = require("./routes/userRoutes");
+app.use("/api/auth", userRoutes); 
 
 app.get("/", (req, res,) => {
     res.send(`Srever is running`)
